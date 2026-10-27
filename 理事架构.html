@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>联课团体理事架构与职务 · 2026/27</title>
+<meta name="description" content="新山宽柔中学 2026/27 学年留任理事架构、职务工作与名册。">
+
+<!-- 进入时先显示的登录画面（旧版 Mac OS 风格） -->
+<link rel="stylesheet" href="macos登录.css">
+<!-- 复古 Mac OS 主题（原暗色霓虹主题备份于 理事架构.original.css） -->
+<link rel="stylesheet" href="理事架构.css">
+
+<!-- 没有 JavaScript 时不要把人挡在登录画面后面 -->
+<noscript><style>
+    #macLogin{ display:none !important; }
+    html:not(.unlocked) body{ overflow:visible !important; }
+    html:not(.unlocked) .menubar,
+    html:not(.unlocked) .wrap{ filter:none !important; transform:none !important; }
+</style></noscript>
+</head>
+<body>
+
+<!-- ==========================================================
+     登录画面（进入页面时先显示，登入后才看到下面的桌面）
+     旧版 Mac OS 风格：抖动灰桌面 + 系统对话框
+     输入任意密码后按 Return 键，或直接点图示即可进入
+     ========================================================== -->
+<div id="macLogin" role="dialog" aria-modal="true" aria-label="登录">
+    <div class="login-center">
+        <div class="mac-window login-window">
+            <div class="title-bar">
+                <span class="close-box"></span>
+                <h2>登录</h2>
+                <span class="zoom-box"></span>
+            </div>
+
+            <div class="window-body login-body">
+                <div class="login-clock">
+                    <p class="login-time" id="loginTime">--:--</p>
+                    <p class="login-date" id="loginDate">&nbsp;</p>
+                </div>
+
+                <div class="login-divider" aria-hidden="true"></div>
+
+                <div class="login-card">
+                    <div class="login-avatar" id="loginAvatar" title="点击图示即可进入（演示）"></div>
+                    <p class="login-name">联课理事</p>
+
+                    <form class="login-form" id="loginForm" autocomplete="off">
+                        <div class="login-field">
+                            <label class="login-label" for="loginPassword">密码：</label>
+                            <input class="login-input" id="loginPassword" type="password"
+                                   aria-label="密码" autocomplete="current-password">
+                        </div>
+
+                        <p class="login-hint" id="loginHint">输入密码后按 Return 键</p>
+
+                        <div class="login-actions">
+                            <button class="btn" type="submit">登入</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="login-power" aria-hidden="true">
+        <span>睡眠</span><span>重新启动</span><span>关机</span>
+    </div>
+</div>
+
+<!-- 桌面选单列（装饰用） -->
+<nav class="menubar" aria-label="选单列">
+    <button class="apple" id="appleBtn" type="button"
+            aria-haspopup="true" aria-expanded="false" title="Apple 选单">&#63743;</button>
+    <span class="menu-item" aria-hidden="true">文件</span>
+    <span class="menu-item" aria-hidden="true">编辑</span>
+    <span class="menu-item" aria-hidden="true">显示</span>
+    <span class="menu-item" aria-hidden="true">特别</span>
+    <span class="menu-item" aria-hidden="true">说明</span>
+    <span id="menuClock" aria-hidden="true">--:--</span>
+
+    <!-- Apple 选单：关机 → 黑屏一秒 → 回到登录画面 -->
+    <div class="apple-menu" id="appleMenu" role="menu" hidden>
+        <button class="apple-menu-item" id="shutdownItem" type="button" role="menuitem">关机</button>
+    </div>
+</nav>
+
+<!-- 关机时的黑幕（盖在登录画面之上） -->
+<div id="screenOff" aria-hidden="true"></div>
+
+<div class="wrap">
+
+    <!-- 主窗口 -->
+    <div class="mac-window">
+        <div class="title-bar">
+            <span class="close-box"></span>
+            <h2>新山宽柔中学 · 联课活动处</h2>
+            <span class="zoom-box"></span>
+        </div>
+        <div class="window-body">
+            <header class="site-header">
+                <p class="eyebrow">SEKOLAH MENENGAH FOON YEW · CO-CURRICULAR ACTIVITIES</p>
+                <h1>团体理事架构 &amp; 职务一览</h1>
+                <p class="sub">
+                    2026/27 学年留任理事名册<br>
+                    顾问老师：黄泽禾&nbsp;师 &nbsp;·&nbsp; 填表日期：22 / 5 / 2026
+                </p>
+                <div class="actions">
+                    <button class="btn" id="togglePrivate" type="button">隐藏私人资料</button>
+                    <button class="btn" id="printBtn" type="button">打印 / 存档</button>
+                </div>
+            </header>
+        </div>
+    </div>
+
+    <main>
+        <!-- ① 总览 -->
+        <section class="mac-window">
+            <div class="title-bar">
+                <span class="close-box"></span>
+                <h2>总览</h2>
+                <span class="zoom-box"></span>
+            </div>
+            <div class="window-body">
+                <div class="stats" id="stats"></div>
+            </div>
+        </section>
+
+        <!-- ② 层级 -->
+        <section class="mac-window">
+            <div class="title-bar">
+                <span class="close-box"></span>
+                <h2>层级结构</h2>
+                <span class="zoom-box"></span>
+            </div>
+            <div class="window-body">
+                <div class="org" id="org"></div>
+            </div>
+        </section>
+
+        <!-- ③ 职务与工作 -->
+        <section class="mac-window">
+            <div class="title-bar">
+                <span class="close-box"></span>
+                <h2>职务与工作内容</h2>
+                <span class="zoom-box"></span>
+            </div>
+            <div class="window-body">
+                <div class="duties" id="duties"></div>
+            </div>
+        </section>
+
+        <!-- ④ 名册 -->
+        <section class="mac-window">
+            <div class="title-bar">
+                <span class="close-box"></span>
+                <h2>理事名册</h2>
+                <span class="zoom-box"></span>
+            </div>
+            <div class="window-body">
+                <div class="toolbar">
+                    <button class="chip active" data-filter="all" type="button">全部</button>
+                    <button class="chip" data-filter="core" type="button">核心执委</button>
+                    <button class="chip" data-filter="func" type="button">功能理事</button>
+                    <button class="chip" data-filter="tech" type="button">研数组</button>
+                    <input class="search" id="search" type="search" placeholder="搜索姓名 / 班级 / 职位…">
+                </div>
+                <div class="table-shell">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>职位</th>
+                                <th>姓名</th>
+                                <th>班级</th>
+                                <th>学号</th>
+                                <th>联络电话</th>
+                            </tr>
+                        </thead>
+                        <tbody id="roster"></tbody>
+                    </table>
+                    <p class="empty" id="empty" hidden>没有符合条件的理事。</p>
+                </div>
+                <p class="privacy-hint">提示：按「隐藏私人资料」可把学号与电话盖成网点黑条，方便对外展示或截图分享。</p>
+            </div>
+        </section>
+
+        <!-- ⑤ 附注 -->
+        <section class="mac-window">
+            <div class="title-bar">
+                <span class="close-box"></span>
+                <h2>原表附注</h2>
+                <span class="zoom-box"></span>
+            </div>
+            <div class="window-body">
+                <div class="notes">
+                    <ol>
+                        <li>所有团体须在留任团员中至少选出五位成为留任团员理事，留任理事的职权至明年新理事成立为止。</li>
+                        <li>留任团员理事须负责下学年的活动职务至学年结束。</li>
+                        <li>遴选财政一职，请勿选明年是高三的团员。</li>
+                        <li>未列入之职位名称，可自行依照下表方式填入（如联络、康乐、教育等），其成绩只注明「理事」。</li>
+                        <li>填妥后正本呈交联课活动处，另外复印二份予顾问老师和留任理事，各自保留一份。</li>
+                        <li>若下学年没有遴选留任理事的团体，可不必填写此表；并于 <span class="deadline">22 MAY 2026</span> 前提呈至联课活动处。</li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>资料整理自「其他理事」表格与理事名单原稿 · 名字与号码按手写原稿录入</footer>
+</div>
+
+<script>
+/* ==========================================================
+   1) 理事资料（依据两张手写原稿录入）
+   level : 1=会长层  2=核心执委  3=功能理事
+   ========================================================== */
+const LEVELS = {
+    1: { name:"会长 / 团长", en:"President · Chairperson" },
+    2: { name:"核心执委",     en:"Core Committee" },
+    3: { name:"功能理事",     en:"Functional Members" }
+};
+
+const MEMBERS = [
+    { role:"会长 / 团长", en:"President",      tag:"main",   name:"魏弘纬", class:"高一理2",   id:"230510", phone:"011-1141 0920", level:1, group:"core",
+      duties:["统筹团体方向与年度活动计划","主持理事会议与会员大会","代表团体与联课处、校方及友团沟通","监督各组进度、考勤与纪律","学年末完成交接与团体总结报告"] },
+
+    { role:"会长 / 团长", en:"Vice President", tag:"vice",   name:"傅懋萱", class:"高二理1",   id:"220081", phone:"019-758 1654", level:1, group:"core",
+      duties:["协助会长处理日常事务，会长缺席时代理职务","分管指定小组并跟进筹备进度","协调各组之间的资源与人力分配","协助审核活动申请与预算提案"] },
+
+    { role:"文书", en:"Secretary",             tag:"main",   name:"林葭镔", class:"高二文商10", id:"220814", phone:"014-982 2686", level:2, group:"core",
+      duties:["撰写会议记录与活动记录","点名、统计出缺席并归档保存","管理团体文件、档案与表格申请","活动后整理报告提交联课活动处","保管团体章程、名单与历年资料"] },
+
+    { role:"文书", en:"Assistant Secretary",   tag:"vice",   name:"蔡幸铧", class:"初三四",    id:"240187", phone:"017-307 8697", level:2, group:"core",
+      duties:["协助文书处理记录与文件","负责活动当天的签到与点名","整理照片、名单等附件资料"] },
+
+    { role:"总务", en:"General Affairs",       tag:"main",   name:"伍韦迅", class:"高二文商7",  id:"220120", phone:"011-1318 5230", level:2, group:"core",
+      duties:["场地与器材的借用、登记与归还","物资采购、保管与库存清点","活动布置、布置善后与清洁","器材损坏维修报备与安全提醒"] },
+
+    { role:"总务", en:"Assistant General Affairs", tag:"vice", name:"陈炫洺", class:"初三14",   id:"240692", phone:"011-1204 9901", level:2, group:"core",
+      duties:["协助器材搬运、布置与善后","负责活动用品分发与回收","协助总务进行库存与借用记录"] },
+
+    { role:"财政", en:"Treasurer",             tag:"main",   name:"包章彤", class:"高二理3",   id:"220197", phone:"018-277 4512", level:2, group:"core",
+      duties:["编制年度活动预算与收支计划","收取、保管团费并开具收据","记录单据与账目，处理报销与结算","配合查账准备学年账目资料"] },
+
+    { role:"财政", en:"Assistant Treasurer",   tag:"vice",   name:"杨家进", class:"高一文商5",  id:"230145", phone:"011-2186 3356", level:2, group:"core",
+      duties:["协助收集单据与记录收支明细","跟进欠费与退款事宜","协助采购比价与付款流程"] },
+
+    { role:"查账", en:"Auditor",               tag:"member", name:"魏弘纬", class:"高一理2",   id:"230510", phone:"011-1141 0920", level:2, group:"core",
+      duties:["定期核查账目、单据与余额","核对收支金额与银行／现金结存","向理事会报告查账结果与建议","监督财政流程是否符合规定"] },
+
+    { role:"纪律", en:"Discipline",            tag:"main",   name:"连洧腾", class:"高文商3",   id:"", phone:"", level:3, group:"func",
+      duties:["维持活动秩序与团体纪律","记录考勤、迟到与缺席情况","提醒团规并协助处理纠纷","协助集合点名与带队"] },
+
+    { role:"纪律", en:"Assistant Discipline",  tag:"vice",   name:"王乾宇", class:"高一理4",   id:"", phone:"", level:3, group:"func",
+      duties:["协助点名与秩序管理","活动前后检查场地与团员动向","协助记录纪律事件与汇报"] },
+
+    { role:"康乐", en:"Recreation",            tag:"main",   name:"李涛伸", class:"高二理4",   id:"", phone:"", level:3, group:"func",
+      duties:["策划团康、联谊与破冰活动","设计游戏与节目流程","安排活动气氛、音乐与主持","协助迎新与欢送活动"] },
+
+    { role:"康乐", en:"Assistant Recreation",  tag:"vice",   name:"陈厚佐", class:"初三7",     id:"", phone:"", level:3, group:"func",
+      duties:["协助团康活动的准备与执行","准备道具、奖品与场地布置","带动新团员参与活动"] },
+
+    { role:"资讯", en:"Publicity / IT",        tag:"member", name:"刘又臻", class:"高二文商3", id:"", phone:"", level:3, group:"func",
+      duties:["摄影、录影与活动影像存档","经营社群平台与发布公告","设计海报、宣传与活动布告","维护团体电子资料与云端文件夹"] },
+
+    { role:"研数 · 3D组", en:"3D Modelling",   tag:"member", name:"谢岢嫒", class:"高一文商1", id:"", phone:"", level:3, group:"tech",
+      duties:["安排 3D 建模课程与练习进度","指导同学完成建模作品","准备比赛与成果展示作品"] },
+
+    { role:"研数 · 3D组", en:"3D Modelling",   tag:"member", name:"陈奕豪", class:"高一文商4", id:"", phone:"", level:3, group:"tech",
+      duties:["协助 3D 组教学与设备操作","协助同学解决建模技术问题","协助作品输出与展示"] },
+
+    { role:"研数 · Robot", en:"Robotics",      tag:"member", name:"谢康翔", class:"高二理1",   id:"", phone:"", level:3, group:"tech",
+      duties:["规划机器人组的培训与训练","负责机器人器材维护与零件管理","带领团员参加机器人比赛"] },
+
+    { role:"研数 · Arduino", en:"Arduino",     tag:"member", name:"庄子旭", class:"初三3",     id:"", phone:"", level:3, group:"tech",
+      duties:["教授 Arduino 基础编程与接线","准备电子零件与教材","协助同学完成实作项目"] },
+
+    { role:"研数 · Arduino", en:"Arduino",     tag:"member", name:"杨轩", class:"高二理4",    id:"", phone:"", level:3, group:"tech",
+      duties:["协助 Arduino 组课程与实作指导","维护电子设备与工具","协助整理程序码与教学范例"] },
+
+    { role:"研教 · Robot", en:"Robotics Training", tag:"member", name:"蔡宇恒", class:"高二理1", id:"", phone:"", level:3, group:"tech",
+      duties:["协助机器人组教学与培训安排","指导初学团员认识器材与安全","协助比赛带队与训练规划"] }
+];
+
+const ADVISOR = { role:"顾问老师", en:"Advisor", name:"黄泽禾 师" };
+
+/* ==========================================================
+   2) 总览统计
+   ========================================================== */
+(function renderStats(){
+    const unique = new Set(MEMBERS.map(m => m.name));
+    const groups = new Set(MEMBERS.filter(m => m.group === "tech").map(m => m.role.split("· ")[1]));
+    const stats = [
+        { v: MEMBERS.length, k: "理事职务数" },
+        { v: unique.size,    k: "理事人数" },
+        { v: 4,              k: "职务层级" },
+        { v: groups.size,    k: "研数技术组" },
+        { v: "22/5/26",      k: "填表日期" }
+    ];
+    document.getElementById("stats").innerHTML = stats.map(s =>
+        `<div class="stat"><b>${s.v}</b><span>${s.k}</span></div>`
+    ).join("");
+})();
+
+/* ==========================================================
+   3) 层级图
+   ========================================================== */
+(function renderOrg(){
+    const node = (m, cls) =>
+        `<div class="node ${cls}"><em>${m.en}</em><strong>${m.role}</strong></div>`;
+
+    const core = MEMBERS.filter(m => m.level === 2);
+    const func = MEMBERS.filter(m => m.level === 3 && m.group === "func");
+    const tech = MEMBERS.filter(m => m.group === "tech");
+
+    // 同一职位只显示一次（正/副合并为一个节点）
+    const mergeUnique = list => {
+        const seen = new Set();
+        return list.filter(m => {
+            if (seen.has(m.role)) return false;
+            seen.add(m.role); return true;
+        });
+    };
+
+    document.getElementById("org").innerHTML = `
+        <div class="org-row">${node(ADVISOR, "advisor")}</div>
+        <div class="link tall"></div>
+        <div class="org-row">${node(MEMBERS[0], "lv1")}</div>
+        <div class="link tall"></div>
+        <div class="level-tag">第 2 层 · 核心执委（文书 / 总务 / 财政 / 查账）</div>
+        <div class="org-row">${mergeUnique(core).map(m => node(m, "lv2")).join("")}</div>
+        <div class="link tall"></div>
+        <div class="level-tag">第 3 层 · 功能理事（纪律 / 康乐 / 资讯）</div>
+        <div class="org-row">${mergeUnique(func).map(m => node(m, "lv3")).join("")}</div>
+        <div class="link tall"></div>
+        <div class="level-tag">第 3 层 · 研数 / 研教技术组</div>
+        <div class="org-row">${mergeUnique(tech).map(m => node(m, "lv4")).join("")}</div>
+    `;
+})();
+
+/* ==========================================================
+   4) 职务与工作内容
+   ========================================================== */
+(function renderDuties(){
+    const pillClass = { core:"core", func:"func", tech:"tech" };
+    const label = { core:"核心", func:"功能", tech:"技术" };
+
+    // 同一职位合并（列出所有担任者）
+    const order = [];
+    const map = new Map();
+    MEMBERS.forEach(m => { if (!map.has(m.role)) { map.set(m.role, []); order.push(m.role); } map.get(m.role).push(m); });
+
+    document.getElementById("duties").innerHTML = order.map(role => {
+        const people = map.get(role);
+        const first  = people[0];
+        const who = people
+            .map(p => `<b>${p.name}</b>（${p.class}${p.tag === "vice" ? " · 副" : ""}）`)
+            .join("、");
+        return `
+            <article class="duty">
+                <h3>${role}
+                    <span class="pill ${pillClass[first.group]}">${label[first.group]}</span>
+                </h3>
+                <span class="en">${first.en} · 第 ${first.level} 层</span>
+                <p class="who">担任：${who}</p>
+                <ul>${first.duties.map(d => `<li>${d}</li>`).join("")}</ul>
+            </article>`;
+    }).join("");
+})();
+
+/* ==========================================================
+   5) 名册表 + 筛选 / 搜索
+   ========================================================== */
+(function renderRoster(){
+    const tbody  = document.getElementById("roster");
+    const empty  = document.getElementById("empty");
+    const search = document.getElementById("search");
+    let filter = "all";
+
+    const badge = tag =>
+        tag === "main"   ? '<span class="badge main">正</span>'   :
+        tag === "vice"   ? '<span class="badge vice">副</span>'   :
+                           '<span class="badge member">理事</span>';
+
+    const idCell    = v => v ? `<span class="id">${v}</span>`    : '<span class="mono-none">—</span>';
+    const phoneCell = v => v ? `<span class="phone">${v}</span>` : '<span class="mono-none">—</span>';
+
+    function draw(){
+        const q = search.value.trim().toLowerCase();
+        const rows = MEMBERS.filter(m => {
+            if (filter !== "all" && m.group !== filter) return false;
+            if (!q) return true;
+            return (m.name + m.class + m.role).toLowerCase().includes(q);
+        });
+
+        tbody.innerHTML = rows.map(m => `
+            <tr>
+                <td class="role">${m.role}${badge(m.tag)}<small>${LEVELS[m.level].name}</small></td>
+                <td>${m.name}</td>
+                <td>${m.class}</td>
+                <td>${idCell(m.id)}</td>
+                <td>${phoneCell(m.phone)}</td>
+            </tr>`).join("");
+
+        empty.hidden = rows.length > 0;
+    }
+
+    document.querySelectorAll(".chip").forEach(chip => {
+        chip.addEventListener("click", () => {
+            document.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+            chip.classList.add("active");
+            filter = chip.dataset.filter;
+            draw();
+        });
+    });
+    search.addEventListener("input", draw);
+    draw();
+})();
+
+/* ==========================================================
+   6) 隐藏私人资料 / 打印 / 选单列时钟
+   ========================================================== */
+(function interactions(){
+    const btn = document.getElementById("togglePrivate");
+    btn.addEventListener("click", () => {
+        const hidden = document.body.classList.toggle("hide-private");
+        btn.textContent = hidden ? "显示私人资料" : "隐藏私人资料";
+    });
+    document.getElementById("printBtn").addEventListener("click", () => window.print());
+
+    const clock = document.getElementById("menuClock");
+    (function tick(){
+        const d = new Date();
+        clock.textContent = d.toLocaleTimeString("zh-Hans", { hour:"2-digit", minute:"2-digit" });
+        setTimeout(tick, 20000);
+    })();
+})();
+
+/* ==========================================================
+   7) 登录画面：时间 / 登入 / 锁定状态（旧版 Mac OS 风格）
+   ========================================================== */
+(function macLogin(){
+    const overlay = document.getElementById("macLogin");
+    if (!overlay) return;
+
+    const html     = document.documentElement;
+    const form     = document.getElementById("loginForm");
+    const input    = document.getElementById("loginPassword");
+    const hint     = document.getElementById("loginHint");
+    const avatar   = document.getElementById("loginAvatar");
+    const card     = overlay.querySelector(".login-card");
+    const timeEl   = document.getElementById("loginTime");
+    const dateEl   = document.getElementById("loginDate");
+    const HINT     = "输入密码后按 Return 键";
+
+    /* 锁定期间，后面的页面不可 Tab、不可被读屏器读到 */
+    const page = [document.querySelector(".menubar"), document.querySelector(".wrap")];
+    page.forEach(el => { if (el) el.inert = true; });
+
+    /* 登入前不要沿用上一次的卷动位置（否则一解锁就停在页面中间） */
+    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+
+    /* ---- 时间 / 日期（每 10 秒对一次） ---- */
+    function tick(){
+        const d = new Date();
+        timeEl.textContent = d.toLocaleTimeString("zh-Hans", { hour:"2-digit", minute:"2-digit", hour12:false });
+        dateEl.textContent = d.toLocaleDateString("zh-Hans", { month:"long", day:"numeric", weekday:"long" });
+        setTimeout(tick, 10000);
+    }
+    tick();
+
+    /* ---- 登入 ---- */
+    let done = false;
+    let hideTimer = 0;
+
+    function unlock(){
+        if (done) return;
+        done = true;
+        html.classList.add("unlocked");   /* 登录画面淡出，桌面淡入 */
+        page.forEach(el => { if (el) el.inert = false; });
+        window.scrollTo(0, 0);
+        hideTimer = setTimeout(() => { overlay.hidden = true; }, 650);
+    }
+
+    /* ---- 锁回登录画面（关机复原用） ---- */
+    function lock(){
+        clearTimeout(hideTimer);
+        overlay.hidden = false;
+        html.classList.remove("unlocked");
+        done = false;
+        input.value = "";
+        hint.textContent = HINT;
+        page.forEach(el => { if (el) el.inert = true; });
+        window.scrollTo(0, 0);
+        void overlay.offsetWidth;   /* 先强制重新排版，否则刚显示的元素 focus 不生效 */
+        input.focus();
+    }
+
+    function deny(){
+        hint.textContent = "演示模式：输入任意密码（或按 Return）即可进入";
+        card.classList.remove("denied");
+        void card.offsetWidth;            /* 重启动画 */
+        card.classList.add("denied");
+        input.focus();
+    }
+
+    form.addEventListener("submit", e => {
+        e.preventDefault();
+        if (input.value.length === 0) deny();   /* 空白 → 摇一下并提示 */
+        else unlock();
+    });
+    avatar.addEventListener("click", unlock);   /* 点击图示即可进入（演示） */
+
+    /* ---- Apple 选单 → 关机 → 黑屏一秒 → 回到登录画面 ---- */
+    const appleBtn = document.getElementById("appleBtn");
+    const appleMenu = document.getElementById("appleMenu");
+    const shutdownItem = document.getElementById("shutdownItem");
+
+    function openMenu(open){
+        appleMenu.hidden = !open;
+        appleBtn.setAttribute("aria-expanded", String(open));
+    }
+
+    appleBtn.addEventListener("click", () => openMenu(appleMenu.hidden));
+    appleBtn.addEventListener("keydown", e => {
+        if (e.key === "ArrowDown"){ e.preventDefault(); openMenu(true); shutdownItem.focus(); }
+    });
+    appleMenu.addEventListener("keydown", e => {
+        if (e.key === "Escape"){ openMenu(false); appleBtn.focus(); }
+    });
+    document.addEventListener("click", e => {
+        if (!appleMenu.hidden && !appleMenu.contains(e.target) && !appleBtn.contains(e.target)) openMenu(false);
+    });
+
+    shutdownItem.addEventListener("click", () => {
+        openMenu(false);
+        html.classList.add("screen-off");            /* 黑屏 */
+        setTimeout(() => {                           /* 黑屏一秒后回到登录画面 */
+            lock();
+            html.classList.remove("screen-off");     /* 黑幕淡出，露出登录画面 */
+        }, 1300);
+    });
+    input.addEventListener("input", () => { if (hint.textContent !== HINT && input.value) hint.textContent = HINT; });
+    input.focus();
+})();
+</script>
+</body>
+</html>

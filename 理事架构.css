@@ -1,0 +1,354 @@
+/* ==========================================================
+   理事架构.css — 复古 Mac OS（System 6 / 7）主题
+   ----------------------------------------------------------
+   设计规则：
+   · 严格 1-bit 配色（黑 / 白），所有「灰色」都用抖动网点
+     （dither pattern）模拟，不使用任何真实灰色或彩色。
+   · 窗口 = 白底 + 1px 黑框 + 条纹标题栏 + 左上关闭格 + 右上缩放格
+   · 按钮 / 选单 / 表格用经典 Mac 的方角与反白（invert）反馈
+   · 字体：Chicago 无法取得，改用 Monaco 系等宽字 + 中文黑体
+   ========================================================== */
+
+:root{
+    /* 仅有两个颜色，灰阶一律靠 pattern 抖动 */
+    --ink:#000;
+    --paper:#fff;
+
+    /* 抖动网点（CSS 纯图案，无图片） */
+    --pat-50:conic-gradient(#000 25%, transparent 0 50%, #000 0 75%, transparent 0); /* 50% 棋盘 */
+    --pat-25:radial-gradient(#000 1px, transparent 1px);                            /* 25% 点阵 */
+    --pat-12:radial-gradient(#000 1px, transparent 1px);                            /* 12% 细点 */
+    --stripe:repeating-linear-gradient(to bottom, #000 0 1px, #fff 1px 2px);       /* 标题栏横纹 */
+
+    --font-ui:"Chicago","Charcoal","Monaco","Menlo","PingFang SC","Hiragino Sans GB","Heiti SC",sans-serif;
+    --font-mono:"Monaco","Menlo","Consolas","Courier New",monospace;
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ -webkit-text-size-adjust:100%; }
+
+body{
+    font-family:var(--font-ui);
+    font-size:14px;
+    line-height:1.65;
+    color:var(--ink);
+    padding:48px 18px 56px;
+
+    /* 桌面 = 50% 抖动灰 */
+    background-color:var(--paper);
+    background-image:var(--pat-50);
+    background-size:4px 4px;
+}
+::selection{ background:var(--ink); color:var(--paper); }
+
+.wrap{ max-width:1020px; margin:0 auto; }
+
+/* ==========================================================
+   选单列（Menu Bar）
+   ========================================================== */
+.menubar{
+    position:fixed; inset:0 0 auto 0; z-index:60;
+    height:26px; padding:0 14px;
+    display:flex; align-items:center; gap:20px;
+    background:var(--paper); border-bottom:1px solid var(--ink);
+    font-size:13px; letter-spacing:.02em;
+}
+.menubar .apple{
+    font:inherit; font-size:15px; line-height:1;
+    padding:2px 5px; margin-left:-5px;
+    color:var(--ink); background:none; border:none; border-radius:0;
+    cursor:pointer;
+}
+.menubar .apple:hover,
+.menubar .apple[aria-expanded="true"]{ background:var(--ink); color:var(--paper); }
+.menubar .apple:focus-visible{ outline:1px dotted var(--ink); outline-offset:1px; }
+.menubar .menu-item{ white-space:nowrap; cursor:default; }
+.menubar .menu-item:first-of-type{ font-weight:700; }
+.menubar .menu-item:hover{ background:var(--ink); color:var(--paper); }
+#menuClock{ margin-left:auto; font-family:var(--font-mono); font-size:12px; }
+
+/* ---------- Apple 选单（按 Apple 标志 → 关机） ---------- */
+.apple-menu{
+    position:absolute; top:24px; left:10px; z-index:70;
+    min-width:128px; padding:2px 0;
+    background:var(--paper);
+    border:1px solid var(--ink);
+    box-shadow:2px 2px 0 rgba(0,0,0,.45);
+}
+.apple-menu[hidden]{ display:none; }
+.apple-menu-item{
+    display:block; width:100%;
+    font:inherit; font-size:13px; text-align:left; cursor:pointer;
+    padding:3px 16px;
+    color:var(--ink); background:var(--paper);
+    border:none; border-radius:0;
+}
+.apple-menu-item:hover,
+.apple-menu-item:focus-visible{ background:var(--ink); color:var(--paper); outline:none; }
+
+/* ==========================================================
+   窗口外壳
+   ========================================================== */
+.mac-window{
+    background:var(--paper);
+    border:1px solid var(--ink);
+    box-shadow:3px 3px 0 rgba(0,0,0,.45);
+    margin-bottom:26px;
+}
+.title-bar{
+    position:relative;
+    height:22px;
+    display:flex; align-items:center; justify-content:center;
+    border-bottom:1px solid var(--ink);
+    background-color:var(--paper);
+    background-image:var(--stripe);
+    background-size:100% 2px;
+}
+.title-bar h2, .title-bar h3{
+    font-size:12.5px; font-weight:700; letter-spacing:.08em;
+    background:var(--paper); padding:0 10px;  /* 把标题从横纹里「挖」出来 */
+    white-space:nowrap;
+}
+.close-box, .zoom-box{
+    position:absolute; top:5px;
+    width:11px; height:11px;
+    border:1px solid var(--ink); background:var(--paper);
+}
+.close-box{ left:5px; }
+.zoom-box{ right:5px; }
+.zoom-box::after{ content:""; position:absolute; inset:2px; border:1px solid var(--ink); }
+
+.window-body{ padding:20px 22px; }
+
+/* ==========================================================
+   页头
+   ========================================================== */
+.site-header{ text-align:center; padding-bottom:4px; }
+.eyebrow{
+    font-family:var(--font-mono);
+    font-size:11px; letter-spacing:.18em; text-transform:uppercase;
+    margin-bottom:12px;
+}
+.site-header h1{ font-size:clamp(1.25rem,3.4vw,1.85rem); line-height:1.35; letter-spacing:.02em; }
+.sub{ font-size:12.5px; margin-top:12px; }
+.sub .rule{ display:block; }
+
+/* ==========================================================
+   按钮（经典 Mac 圆角黑框按钮，按下反白）
+   ========================================================== */
+.actions{ display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin-top:20px; }
+.btn{
+    font:inherit; font-size:13px; font-weight:700; cursor:pointer;
+    padding:4px 20px;
+    color:var(--ink); background:var(--paper);
+    border:2px solid var(--ink); border-radius:10px;
+}
+.btn:hover, .btn:active, .btn:focus-visible{ background:var(--ink); color:var(--paper); outline:none; }
+
+/* ==========================================================
+   区块 / 标题
+   ========================================================== */
+section{ margin-bottom:26px; }
+h2 .num{
+    flex:none; width:22px; height:22px; margin-right:10px;
+    display:inline-grid; place-items:center; font-size:11px;
+    color:var(--paper); background:var(--ink);
+}
+
+/* ==========================================================
+   统计（每格顶部一条抖动条）
+   ========================================================== */
+.stats{ display:grid; grid-template-columns:repeat(auto-fit,minmax(132px,1fr)); gap:12px; }
+.stat{ border:1px solid var(--ink); padding:0 14px 12px; }
+.stat::before{
+    content:""; display:block; height:8px;
+    margin:0 -14px 12px;
+    border-bottom:1px solid var(--ink);
+    background-color:var(--paper);
+    background-image:var(--pat-25); background-size:4px 4px;
+}
+.stat b{ display:block; font-family:var(--font-mono); font-size:22px; line-height:1.25; }
+.stat span{ font-size:11px; letter-spacing:.06em; }
+
+/* ==========================================================
+   层级图（层级 = 顶部抖动条的密度）
+   ========================================================== */
+.org{ display:flex; flex-direction:column; align-items:center; }
+.org-row{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; width:100%; }
+.node{
+    position:relative; min-width:142px; padding:9px 14px 8px;
+    border:1px solid var(--ink); background:var(--paper); text-align:center;
+}
+.node::before{
+    content:""; position:absolute; inset:-1px -1px auto -1px; height:7px;
+    border-bottom:1px solid var(--ink);
+    background-color:var(--paper);
+}
+.node strong{ display:block; margin-top:6px; font-size:13px; }
+.node em{ font-style:normal; display:block; font-size:10px; letter-spacing:.1em; font-family:var(--font-mono); }
+
+.node.advisor{ border-width:2px; }
+.node.advisor::before{ background-image:none; background-color:var(--ink); }
+.node.lv1::before{ background-image:var(--pat-25); background-size:3px 3px; }
+.node.lv2::before{ background-image:var(--pat-25); background-size:5px 5px; }
+.node.lv3::before{ background-image:var(--pat-12); background-size:7px 7px; }
+.node.lv4::before{ background-image:none; }
+
+.link{ width:1px; height:20px; background:var(--ink); }
+.link.tall{ height:30px; }
+.level-tag{
+    font-size:11px; padding:2px 12px; margin:8px 0 10px;
+    border:1px solid var(--ink);
+    background-color:var(--paper);
+    background-image:var(--pat-12); background-size:7px 7px;
+}
+
+/* ==========================================================
+   职务卡（滑过时标题栏反白，像被选取的列表项）
+   ========================================================== */
+.duties{ display:grid; grid-template-columns:repeat(auto-fit,minmax(288px,1fr)); gap:16px; }
+.duty{ border:1px solid var(--ink); background:var(--paper); }
+.duty h3{
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+    font-size:13.5px; padding:6px 12px;
+    border-bottom:1px solid var(--ink);
+}
+.duty:hover h3, .duty:focus-within h3{ background:var(--ink); color:var(--paper); }
+.duty:hover .pill{ color:var(--paper); border-color:var(--paper); background-image:none; background-color:transparent; }
+.duty .en{
+    display:block; font-family:var(--font-mono); font-size:10px;
+    letter-spacing:.12em; text-transform:uppercase;
+    padding:10px 12px 0;
+}
+.duty .who{ font-size:12px; padding:4px 12px 10px; border-bottom:1px dotted var(--ink); }
+.duty .who b{ font-weight:700; }
+.duty ul{ list-style:none; padding:10px 12px 12px; display:flex; flex-direction:column; gap:7px; }
+.duty li{ position:relative; padding-left:15px; font-size:12.5px; }
+.duty li::before{ content:""; position:absolute; left:1px; top:.62em; width:5px; height:5px; background:var(--ink); }
+
+.pill{
+    font-size:10px; padding:0 7px; white-space:nowrap;
+    border:1px solid var(--ink); background:var(--paper); color:var(--ink);
+}
+.pill.core{ background-color:var(--ink); color:var(--paper); }
+.pill.func{ background-image:var(--pat-25); background-size:3px 3px; }
+.pill.tech{ background-image:none; }
+
+/* ==========================================================
+   工具列（筛选 = 方形切换钮，选取后反白）
+   ========================================================== */
+.toolbar{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:14px; }
+.chip{
+    font:inherit; font-size:12px; cursor:pointer;
+    padding:3px 14px; border:1px solid var(--ink);
+    background:var(--paper); color:var(--ink);
+}
+.chip:hover{ background-image:var(--pat-25); background-size:3px 3px; }
+.chip.active{ background:var(--ink); color:var(--paper); font-weight:700; }
+
+.search{
+    font:inherit; font-size:12.5px; flex:1 1 190px; min-width:170px;
+    padding:4px 8px; border:1px solid var(--ink);
+    background:var(--paper); color:var(--ink);
+}
+.search:focus{ outline:1px dotted var(--ink); outline-offset:1px; }
+.search::placeholder{ color:#000; opacity:.45; }
+
+/* ==========================================================
+   名册表（经典格线 + 滑过整列反白）
+   ========================================================== */
+.table-shell{
+    border:1px solid var(--ink); background:var(--paper);
+    overflow-x:auto; overflow-y:hidden;
+}
+.table-shell::-webkit-scrollbar{ height:15px; }
+.table-shell::-webkit-scrollbar-track{
+    background-color:var(--paper);
+    background-image:var(--pat-25); background-size:4px 4px;
+    border-top:1px solid var(--ink);
+}
+.table-shell::-webkit-scrollbar-thumb{ background:var(--paper); border:1px solid var(--ink); }
+
+table{ width:100%; border-collapse:collapse; font-size:12.5px; }
+thead th{
+    font-size:10.5px; letter-spacing:.1em; text-transform:uppercase;
+    font-weight:700; text-align:left; white-space:nowrap;
+    padding:6px 10px; border:1px solid var(--ink);
+    background-color:var(--paper);
+    background-image:var(--pat-12); background-size:7px 7px;
+}
+tbody td{ padding:7px 10px; border:1px solid var(--ink); vertical-align:middle; }
+tbody tr:hover{ background:var(--ink); color:var(--paper); }
+
+td.role{ font-weight:700; white-space:nowrap; }
+td.role small{ display:block; font-weight:400; font-size:10px; letter-spacing:.1em; font-family:var(--font-mono); }
+
+.badge{
+    display:inline-block; margin-left:7px; vertical-align:middle;
+    font-size:10px; padding:0 6px; border:1px solid var(--ink);
+    background:var(--paper); color:var(--ink);
+}
+.badge.main{ background-color:var(--ink); color:var(--paper); font-weight:700; }
+.badge.vice{ background-image:var(--pat-50); background-size:3px 3px; font-weight:700; }
+.badge.member{ background-image:none; }
+
+.id, .phone{ font-family:var(--font-mono); font-size:12px; color:inherit; }
+.mono-none{ color:inherit; opacity:.5; }
+
+/* 隐藏私人资料 → 用抖动黑条盖掉学号 / 电话 */
+body.hide-private .id, body.hide-private .phone{
+    display:inline-block; min-width:7em; height:1.08em;
+    color:transparent; overflow:hidden; vertical-align:middle;
+    border:1px solid var(--ink);
+    background-color:var(--paper);
+    background-image:var(--pat-50); background-size:4px 4px;
+}
+
+.privacy-hint{ font-size:11.5px; margin-top:10px; }
+.empty{ padding:16px; text-align:center; font-size:12.5px; border-top:1px solid var(--ink); }
+
+/* ==========================================================
+   附注（编号 = 黑底白字小方块）
+   ========================================================== */
+.notes{ border:1px solid var(--ink); padding:16px 18px; }
+.notes ol{ list-style:none; counter-reset:n; display:flex; flex-direction:column; gap:10px; }
+.notes li{ counter-increment:n; position:relative; padding-left:30px; font-size:12.5px; }
+.notes li::before{
+    content:counter(n); position:absolute; left:0; top:.15em;
+    width:18px; height:18px; display:grid; place-items:center;
+    font-family:var(--font-mono); font-size:11px;
+    color:var(--paper); background:var(--ink);
+}
+.notes .deadline{ background:var(--ink); color:var(--paper); padding:0 5px; font-weight:700; }
+
+footer{
+    text-align:center; font-size:11px; margin-top:30px; padding-top:16px;
+    border-top:1px dotted var(--ink);
+}
+
+/* ==========================================================
+   打印 / 存档（保留抖动网点）
+   ========================================================== */
+@media print{
+    body{
+        padding:0;
+        background-image:none;
+        -webkit-print-color-adjust:exact; print-color-adjust:exact;
+    }
+    .menubar, .actions, .toolbar, .privacy-hint, footer{ display:none; }
+    .mac-window{ box-shadow:none; margin-bottom:16px; }
+    .duty:hover h3, .duty:focus-within h3{ background:var(--paper); color:var(--ink); }
+    tbody tr:hover{ background:transparent; color:var(--ink); }
+    body.hide-private .id, body.hide-private .phone{ color:transparent; }
+}
+
+/* ==========================================================
+   窄屏
+   ========================================================== */
+@media (max-width:640px){
+    body{ padding:44px 12px 40px; }
+    .menubar{ gap:12px; font-size:12px; }
+    .menubar .menu-item:nth-child(n+5){ display:none; }
+    .window-body{ padding:16px 14px; }
+    thead th:nth-child(5), tbody td:nth-child(5){ display:none; }
+}
