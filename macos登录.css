@@ -1,0 +1,149 @@
+/* ==========================================================
+   macos登录.css — 进入页面时的登录画面（旧版 Mac OS 风格）
+   ----------------------------------------------------------
+   与隔壁的「理事架构.css」同一套设计语言：纯黑白、抖动网点、
+   条纹标题栏、方角按钮。窗口外壳与颜色变量直接沿用
+   理事架构.css 里的 .mac-window / .title-bar / .close-box /
+   .window-body / .btn 与 --pat-50、--ink、--paper、--font-mono，
+   所以这里只补登录画面自己需要的部分。
+
+   流程：载入 → 锁定画面（时钟 + 密码对话框）→ 登入
+         → 对话框淡出，显示后面的复古桌面
+   ========================================================== */
+
+/* ---------- 锁定状态：后面的页面先模糊、微放大 ----------
+   注意：效果只能加在 .wrap / .menubar 上，不能加在 body 上——
+   否则连登录画面本身都会被模糊，fixed 定位也会被拉伸成整页高。
+   锁定期间页面不可滚动，所以选单列看起来仍然是钉在顶部的。 */
+html:not(.unlocked) body{ overflow:hidden; }
+html:not(.unlocked) .menubar,
+html:not(.unlocked) .wrap{
+    transform:scale(1.02);
+    filter:blur(7px) saturate(.85);
+}
+.menubar, .wrap{ transition:filter .55s ease, transform .55s ease; }
+
+/* ==========================================================
+   锁定画面 = 抖动灰桌面 + 一个系统对话框
+   ========================================================== */
+#macLogin{
+    position:fixed; inset:0; z-index:900;
+    display:flex; align-items:center; justify-content:center;
+    padding:24px;
+    color:var(--ink);
+    background-color:var(--paper);
+    background-image:var(--pat-50); background-size:4px 4px;
+    opacity:1;
+    transition:opacity .45s ease, transform .45s ease;
+}
+#macLogin[hidden]{ display:none; }
+html.unlocked #macLogin{ opacity:0; transform:scale(1.04); pointer-events:none; }
+
+/* ---------- 关机：黑幕 → 一秒 → 回到登录画面 ---------- */
+#screenOff{
+    position:fixed; inset:0; z-index:1000;   /* 盖在登录画面之上 */
+    background:#000;
+    opacity:0; pointer-events:none;
+    transition:opacity .3s ease;
+}
+html.screen-off #screenOff{ opacity:1; pointer-events:auto; }
+
+.login-center{ width:100%; display:flex; justify-content:center; }
+.login-window{ width:min(392px, 100%); margin:0; box-shadow:4px 4px 0 rgba(0,0,0,.5); }
+.login-body{ padding:18px 20px 20px; text-align:center; }
+
+/* ---------- 时钟面板（像旧版 Alarm Clock 的数字钟） ---------- */
+.login-clock{
+    border:1px solid var(--ink);
+    padding:9px 12px 8px;
+    background-color:var(--paper);
+}
+.login-time{
+    font-family:var(--font-mono);
+    font-size:27px; font-weight:700; line-height:1.15;
+    letter-spacing:.06em;
+    font-variant-numeric:tabular-nums;
+}
+.login-date{ font-size:11.5px; letter-spacing:.05em; margin-top:2px; }
+
+.login-divider{ height:1px; background:var(--ink); margin:16px 0; }
+
+/* ---------- 使用者图示：方形 1-bit 剪影 ---------- */
+.login-card{ display:flex; flex-direction:column; align-items:center; }
+.login-avatar{
+    position:relative; width:64px; height:64px;
+    border:1px solid var(--ink); background-color:var(--paper);
+    cursor:pointer;
+}
+.login-avatar:hover{ background-image:var(--pat-12); background-size:7px 7px; }
+.login-avatar::before{   /* 头 */
+    content:""; position:absolute; top:18%; left:50%; transform:translateX(-50%);
+    width:30%; height:30%; border-radius:50%; background:var(--ink);
+}
+.login-avatar::after{    /* 肩 */
+    content:""; position:absolute; bottom:12%; left:50%; transform:translateX(-50%);
+    width:58%; height:33%; background:var(--ink);
+    border-radius:50% 50% 40% 40% / 62% 62% 38% 38%;
+}
+
+.login-name{ font-size:13px; font-weight:700; margin-top:9px; }
+
+/* ---------- 密码栏 ---------- */
+.login-form{ margin-top:14px; width:100%; }
+.login-field{ display:flex; align-items:center; justify-content:center; gap:8px; }
+.login-label{ font-size:12.5px; }
+.login-input{
+    width:172px; font-family:var(--font-mono); font-size:13px;
+    padding:3px 7px;
+    color:var(--ink); background:var(--paper);
+    border:1px solid var(--ink); border-radius:0;
+}
+.login-input:focus{ outline:1px dotted var(--ink); outline-offset:1px; }
+
+.login-hint{ font-size:11.5px; margin-top:9px; min-height:1.5em; }
+.login-actions{ margin-top:14px; }
+
+/* ---------- 密码空白时的摇动 ---------- */
+@keyframes login-shake{
+    0%, 100%{ transform:translateX(0); }
+    15%{ transform:translateX(-8px); }
+    30%{ transform:translateX(7px); }
+    45%{ transform:translateX(-5px); }
+    60%{ transform:translateX(3px); }
+    80%{ transform:translateX(-2px); }
+}
+.login-card.denied{ animation:login-shake .45s ease; }
+
+/* ---------- 桌面底部的电源选项（画面装饰，非按钮） ---------- */
+.login-power{
+    position:absolute; bottom:22px; left:0; right:0;
+    text-align:center;
+    font-size:11.5px; letter-spacing:.08em;
+}
+.login-power span{ margin:0 13px; cursor:default; }
+
+/* ==========================================================
+   窄屏
+   ========================================================== */
+@media (max-width:520px){
+    #macLogin{ padding:16px; }
+    .login-body{ padding:14px 14px 16px; }
+    .login-time{ font-size:23px; }
+    .login-input{ width:132px; }
+    .login-power{ bottom:14px; font-size:11px; }
+    .login-power span{ margin:0 8px; }
+}
+
+/* ==========================================================
+   减少动态效果 / 打印
+   ========================================================== */
+@media (prefers-reduced-motion: reduce){
+    .menubar, .wrap, #macLogin, #screenOff{ transition:none; }
+    .login-card.denied{ animation:none; }
+}
+@media print{
+    #macLogin{ display:none !important; }
+    html:not(.unlocked) body{ overflow:visible; }
+    html:not(.unlocked) .menubar,
+    html:not(.unlocked) .wrap{ filter:none; transform:none; }
+}
